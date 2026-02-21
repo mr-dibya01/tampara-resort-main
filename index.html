@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tampara Resort - Lakeside Luxury Resort</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Swiper CSS CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <link rel="shortcut icon" href="images/fevicon.png" type="image/x-icon">
+    <!-- Remix Icon CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.0.0/remixicon.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00a8e8;
+            --secondary: #ff6b6b;
+            --accent: #ffa500;
+            --dark: #1a1a2e;
+            --light: #f5f7fa;
+        }
+
+        body,
+        html {
+            width: 100%;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark);
+        }
+
+        /* Hero Parallax */
+        .hero-parallax {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Preloader */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .preloader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Mobile menu animation */
+        .mobile-menu {
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        /* Button ripple effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Hover effects */
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Swiper customization */
+        .swiper-pagination-bullet {
+            background: var(--primary) !important;
+        }
+
+        .swiper-pagination-bullet-active {
+            background: var(--secondary) !important;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: var(--primary) !important;
+        }
+
+        /* Gallery masonry */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            grid-auto-flow: dense;
+            /* IMPORTANT: Empty space remove */
+        }
+
+        @media (min-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .gallery-item:nth-child(2) {
+                grid-row: span 2;
+                height: 100%;
+            }
+
+            .gallery-item:nth-child(5) {
+                grid-column: span 2;
+                height: 100%;
+            }
+        }
+
+
+        /* Form styling */
+        .form-input {
+            border-bottom: 2px solid #e0e0e0;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-bottom-color: var(--primary);
+        }
+
+        /* Success Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        /* Desktop only */
+        @media (min-width: 768px) {
+            .mobile-only {
+                display: none;
+            }
+        }
+
+        /* Mobile only */
+        @media (max-width: 767px) {
+            .heroSwiper {
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-white">
+
+
+    <!-- Mobile Menu Overlay -->
+    <div class="fixed inset-0 bg-black/50 mobile-menu-overlay hidden z-40" id="menuOverlay"></div>
+
+    <!-- Mobile Menu (Off-canvas) -->
+    <div class="fixed left-0 top-0 h-screen w-64 bg-white shadow-lg transform -translate-x-full mobile-menu z-50 transition-transform duration-300"
+        id="mobileMenu">
+        <div class="flex justify-between items-center p-6 border-b">
+            <h2 class="text-xl font-bold text-blue-600">Menu</h2>
+            <button id="closeMobileMenu" class="text-2xl hover:text-blue-600"><i class="ri-close-line"></i></button>
+        </div>
+        <nav class="flex flex-col p-6 space-y-4">
+            <a href="#about" class="text-dark hover:text-blue-600 font-medium transition">About</a>
+            <a href="#rooms" class="text-dark hover:text-blue-600 font-medium transition">Rooms</a>
+            <a href="#amenities" class="text-dark hover:text-blue-600 font-medium transition">Amenities</a>
+            <a href="#dining" class="text-dark hover:text-blue-600 font-medium transition">Dining</a>
+            <a href="#wedding" class="text-dark hover:text-blue-600 font-medium transition">Wedding</a>
+            <a href="#places" class="text-dark hover:text-blue-600 font-medium transition">Explore</a>
+            <a href="#gallery" class="text-dark hover:text-blue-600 font-medium transition">Gallery</a>
+            <a href="#testimonials" class="text-dark hover:text-blue-600 font-medium transition">Reviews</a>
+            <a href="#booking" class="text-dark hover:text-blue-600 font-medium transition">Book Now</a>
+            <a href="#contact" class="text-dark hover:text-blue-600 font-medium transition">Contact</a>
+        </nav>
+    </div>
+
+    <!-- Navigation -->
+    <header class="sticky top-0 z-40 bg-white shadow-md">
+        <nav class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img loading="lazy" src="images/logo.png" alt="Tampara Logo" class="h-12 w-60  object-contain">
+            </div>
+            `
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8">
+                <a href="#about" class="text-dark hover:text-blue-600 font-medium transition duration-300">About</a>
+                <a href="#rooms" class="text-dark hover:text-blue-600 font-medium transition duration-300">Rooms</a>
+                <a href="#amenities"
+                    class="text-dark hover:text-blue-600 font-medium transition duration-300">Amenities</a>
+                <a href="#dining" class="text-dark hover:text-blue-600 font-medium transition duration-300">Dining</a>
+                <a href="#wedding" class="text-dark hover:text-blue-600 font-medium transition duration-300">Wedding</a>
+                <a href="#places" class="text-dark hover:text-blue-600 font-medium transition duration-300">Explore</a>
+                <a href="#gallery" class="text-dark hover:text-blue-600 font-medium transition duration-300">Gallery</a>
+                <a href="#testimonials"
+                    class="text-dark hover:text-blue-600 font-medium transition duration-300">Reviews</a>
+                <a href="#contact" class="text-dark hover:text-blue-600 font-medium transition duration-300">Contact</a>
+            </div>
+
+            <div class="hidden md:flex space-x-4">
+                <button onclick="document.getElementById('booking').scrollIntoView({behavior: 'smooth'})"
+                    class="px-6 py-2 bg-gradient-to-r from-orange-400 to-red-500 text-white rounded-lg hover:shadow-lg transition duration-300 font-medium">Book</button>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobileMenuBtn" class="md:hidden text-2xl text-dark hover:text-blue-600">
+                <i class="ri-menu-line"></i>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative h-[80vh] lg:h-screen w-full overflow-hidden">
+
+        <div class="swiper heroSwiper h-full">
+            <div class="swiper-wrapper">
+
+                <!-- Desktop images -->
+                <div class="swiper-slide">
+                    <img loading="lazy" src="images/new hero.jpeg" class="w-full h-full object-cover">
+                </div>
+                <div class="swiper-slide">
+                    <img loading="lazy" src="images/new hero 2.jpeg" class="w-full h-full object-cover">
+                </div>
+                <div class="swiper-slide">
+                    <img loading="lazy" src="images/new hero 3.jpeg" class="w-full h-full object-cover">
+                </div>
+
+
+                <!-- Mobile images -->
+                <!-- <div class="swiper-slide mobile-only">
+                    <img loading="lazy" src="images/new hero1.JPG" class="w-full h-full object-cover">
+                </div>
+                <div class="swiper-slide mobile-only">
+                    <img loading="lazy" src="images/new hero 2.JPG" class="w-full h-full object-cover">
+                </div>
+                <div class="swiper-slide mobile-only">
+                    <img loading="lazy" src="images/new hero 3.JPG" class="w-full h-full object-cover">
+                </div> -->
+            </div>
+
+            <div class="swiper-pagination"></div>
+        </div>
+
+    </section>
+
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-gradient-to-br from-blue-50 to-cyan-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-dark mb-4">About Tampara Resort</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-blue-600 to-orange-400 mx-auto"></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="about-image">
+                    <img loading="lazy" src="images/about.png" alt="Resort exterior" class="rounded-2xl shadow-2xl"
+                        loading="lazy">
+                </div>
+                <div class="about-content">
+                    <p class="text-lg text-gray-700 mb-6 leading-normal text-justify">
+                        The resort in Tampara is a division of Rajarani. It starts operating in 2022. We have always
+                        believed in providing the greatest service to our customers, which is why we are currently
+                        regarded as one of the top resorts in Ganjam, Odisha. We have everything you need for all of
+                        your needs, whether it is the breath taking view of Tampara Lake, the renowned rooftop dining
+                        experience, the enormous swimming pool for a deep diving adventure, or the large banquet space.
+                        When you order a service from us, we’ll handle everything. Bring your family to Tampa Resort!
+                        The place to go when travelling.
+                    </p>
+
+                    <p class="text-lg text-gray-700 mb-6 leading-normal text-justify">
+                        Our prime location on the serene shores of Tampara Lake, paired with our renowned dining
+                        experiences and
+                        wide-ranging wellness facilities, makes us the perfect destination for romantic escapes, family
+                        vacations, and
+                        corporate gatherings. With exceptional service and thoughtfully designed spaces, we ensure every
+                        moment becomes a
+                        memorable experience.
+                    </p>
+
+                    <div class="grid grid-cols-3 gap-4 py-8">
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-blue-600">40+</div>
+                            <p class="text-gray-600 text-sm">Rooms & Suites</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-orange-500">1</div>
+                            <p class="text-gray-600 text-sm">Restaurants</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold text-red-500">5⭐</div>
+                            <p class="text-gray-600 text-sm">Rating</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wedding Section -->
+    <section id="wedding" class="py-5 md:py-36 bg-gradient-to-r from-pink-50 to-red-50">
+        <div class="max-w-7xl mx-auto px-4">
+
+            <div class="text-center mb-20">
+                <h2 class="text-4xl md:text-6xl font-extrabold text-pink-800 mb-4">
+                    The Best Location for a <span class="text-red-600">Lakeside Wedding</span>
+                </h2>
+                <div class="w-28 h-1.5 bg-gradient-to-r from-pink-600 to-red-500 mx-auto rounded-full"></div>
+                <p class="text-xl text-gray-700 mt-6 max-w-3xl mx-auto">
+                    Exchange vows against the beautiful backdrop of our scenic lakeside venue for a truly unforgettable
+                    celebration.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-16 items-center mb-20">
+
+                <div class="wedding-videos grid grid-cols-1 gap-6" data-gsap-target="left-wedding-img">
+
+                    <!-- Image 1 -->
+                    <img loading="lazy" src="images/nimg1.jpeg" alt="Wedding Event at Tampara Resort"
+                        class="rounded-3xl shadow-2xl w-full h-[55vh] object-cover border-4 border-white transition duration-500 hover:scale-[1.02]">
+
+                    <!-- Image 2 -->
+                    <img loading="lazy" src="images/nimg2.jpeg" alt="Wedding Celebration at Tampara Resort"
+                        class="rounded-3xl shadow-xl w-full h-[55vh] object-cover object-center transition duration-500 hover:scale-[1.02]">
+                </div>
+
+
+                <div class="wedding-content space-y-8" data-gsap-target="right-wedding-content">
+
+                    <div class="bg-white rounded-3xl p-8 shadow-2xl border-t-4 border-red-500">
+                        <i class="fas fa-heart text-5xl text-red-600 mb-3 block"></i>
+                        <h3 class="text-3xl font-bold text-pink-800 mb-3">Your Perfect Venue</h3>
+                        <p class="text-gray-700 leading-relaxed">
+                            Marriage is the start of a new chapter. Celebrate this beautiful union of two people and two
+                            families with unforgettable moments against the serene, scenic backdrop of our lakeside
+                            resort. We handle every detail, so you can enjoy your day.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div
+                            class="bg-white rounded-xl p-5 shadow-lg text-center border-b-4 border-pink-600 hover:bg-pink-50 transition duration-300">
+                            <i class="fas fa-landmark text-4xl text-blue-600 mb-2"></i>
+                            <p class="font-extrabold text-gray-800">Indoor & Outdoor</p>
+                            <p class="text-sm text-gray-600">Venues Available</p>
+                        </div>
+                        <div
+                            class="bg-white rounded-xl p-5 shadow-lg text-center border-b-4 border-orange-600 hover:bg-pink-50 transition duration-300">
+                            <i class="fas fa-users text-4xl text-orange-600 mb-2"></i>
+                            <p class="font-extrabold text-gray-800">Capacity</p>
+                            <p class="text-sm text-gray-600">50 - 1500 Guests</p>
+                        </div>
+                        <div
+                            class="bg-white rounded-xl p-5 shadow-lg text-center border-b-4 border-green-600 hover:bg-pink-50 transition duration-300">
+                            <i class="fas fa-utensils text-4xl text-green-600 mb-2"></i>
+                            <p class="font-extrabold text-gray-800">Multi-Cuisine</p>
+                            <p class="text-sm text-gray-600">Dining Options</p>
+                        </div>
+                        <div
+                            class="bg-white rounded-xl p-5 shadow-lg text-center border-b-4 border-purple-600 hover:bg-pink-50 transition duration-300">
+                            <i class="fas fa-microphone text-4xl text-purple-600 mb-2"></i>
+                            <p class="font-extrabold text-gray-800">Live Music</p>
+                            <p class="text-sm text-gray-600">Entertainment</p>
+                        </div>
+                    </div>
+
+                    <button onclick="document.getElementById('booking').scrollIntoView({behavior: 'smooth'})"
+                        class="w-full py-4 bg-gradient-to-r from-pink-600 to-red-500 text-white rounded-xl shadow-xl hover:shadow-2xl transition font-extrabold text-xl transform hover:scale-[1.01] tracking-wider">
+                        Plan Your Dream Wedding
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl p-10 shadow-2xl border-b-4 border-pink-600"
+                data-gsap-target="wedding-amenities">
+                <h3 class="text-3xl font-bold text-pink-800 mb-8 text-center">Comprehensive Wedding Amenities & Services
+                </h3>
+                <div class="grid md:grid-cols-4 grid-cols-2 gap-8">
+                    <div class="text-center transition duration-300 hover:text-pink-600">
+                        <i class="fas fa-spray-can text-5xl text-pink-600 mb-3"></i>
+                        <p class="font-bold text-gray-800">Event Decoration</p>
+                    </div>
+                    <div class="text-center transition duration-300 hover:text-blue-600">
+                        <i class="fas fa-camera-retro text-5xl text-blue-600 mb-3"></i>
+                        <p class="font-bold text-gray-800">Photography</p>
+                    </div>
+                    <div class="text-center transition duration-300 hover:text-orange-600">
+                        <i class="fas fa-concierge-bell text-5xl text-orange-600 mb-3"></i>
+                        <p class="font-bold text-gray-800">Catering Services</p>
+                    </div>
+                    <div class="text-center transition duration-300 hover:text-purple-600">
+                        <i class="fas fa-volume-up text-5xl text-purple-600 mb-3"></i>
+                        <p class="font-bold text-gray-800">Audio & Sound</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="rooms" class="py-14 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6">
+
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 mb-3 tracking-tight">
+                    Experience Our <span class="text-blue-600">Luxury</span> Stays
+                </h2>
+                <p class="text-base sm:text-lg text-gray-600">Discover the perfect room for your comfortable retreat.
+                </p>
+                <div class="w-24 h-1.5 bg-gradient-to-r from-blue-600 to-orange-500 mx-auto mt-3 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12">
+
+                <!-- Executive Room -->
+                <div
+                    class="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-blue-200 transition duration-700 group">
+
+                    <div class="relative">
+                        <img loading="lazy" src="images/executive.png"
+                            class="w-full h-64 sm:h-72 object-cover group-hover:scale-105 transition duration-700"
+                            alt="Executive Room">
+                        <div
+                            class="absolute inset-0 bg-blue-900 opacity-10 group-hover:opacity-0 transition duration-500">
+                        </div>
+                    </div>
+
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Executive Room</h3>
+                        <p class="text-gray-600 mb-6 border-l-4 border-blue-400 pl-3 italic">
+                            Premium 180 Sqft rooms with Italian tiling and a relaxing balcony/terrace. Versace-designed
+                            linens included.
+                        </p>
+
+                        <ul class="grid grid-cols-2 gap-y-3 mb-8 text-gray-800">
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-layout-4-line text-blue-600 text-lg sm:text-xl"></i>
+                                <span>180 Sqft Space</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-hotel-bed-line text-blue-600 text-lg sm:text-xl"></i>
+                                <span>King Size Bed</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-wifi-line text-blue-600 text-lg sm:text-xl"></i>
+                                <span>Free WiFi</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-restaurant-line text-blue-600 text-lg sm:text-xl"></i>
+                                <span>Free Breakfast</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-temp-hot-line text-blue-600 text-lg sm:text-xl"></i>
+                                <span>Air Conditioner</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-t-shirt-2-line text-blue-600 text-lg sm:text-xl"></i>
+                                <span>Laundry Service</span>
+                            </li>
+                        </ul>
+
+                        <a href="##bookingForm"
+                            class="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-lg shadow-blue-400/50 hover:bg-blue-700 transition">
+                            Book Executive Room
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Premium Room -->
+                <div
+                    class="bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-orange-200 transition duration-700 group">
+
+                    <div class="relative">
+                        <img loading="lazy" src="images/premium.png"
+                            class="w-full h-64 sm:h-72 object-cover group-hover:scale-105 transition duration-700"
+                            alt="Premium Room">
+                        <div
+                            class="absolute inset-0 bg-orange-900 opacity-10 group-hover:opacity-0 transition duration-500">
+                        </div>
+                    </div>
+
+                    <div class="p-6 sm:p-8">
+                        <h3 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Premium Room</h3>
+                        <p class="text-gray-600 mb-6 border-l-4 border-orange-400 pl-3 italic">
+                            Spacious 240 Sqft rooms with a stunning view of Tampara Lake. Twin king-size beds with
+                            Versace linen.
+                        </p>
+
+                        <ul class="grid grid-cols-2 gap-y-3 mb-8 text-gray-800">
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-layout-4-line text-orange-600 text-lg sm:text-xl"></i>
+                                <span>240 Sqft Space</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-hotel-bed-line text-orange-600 text-lg sm:text-xl"></i>
+                                <span>Twin King Bed</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-wifi-line text-orange-600 text-lg sm:text-xl"></i>
+                                <span>Free WiFi</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-restaurant-line text-orange-600 text-lg sm:text-xl"></i>
+                                <span>Free Breakfast</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-temp-hot-line text-orange-600 text-lg sm:text-xl"></i>
+                                <span>Air Conditioner</span>
+                            </li>
+                            <li class="flex items-center space-x-2 sm:space-x-3 font-semibold">
+                                <i class="ri-t-shirt-2-line text-orange-600 text-lg sm:text-xl"></i>
+                                <span>Laundry Service</span>
+                            </li>
+                        </ul>
+
+                        <a href="#bookingForm"
+                            class="w-full sm:w-auto px-8 py-3 bg-orange-500 text-white font-semibold rounded-lg shadow-lg shadow-orange-400/50 hover:bg-orange-600 transition">
+                            Book Premium Room
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Amenities Section -->
+    <section id="amenities" class="py-5 w-full bg-gradient-to-r from-blue-600 to-cyan-500">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">World-Class Amenities</h2>
+                <div class="w-20 h-1 bg-white mx-auto"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-xl p-8 text-white text-center hover:bg-white/20 transition duration-300">
+                    <i class="ri-water-flash-line text-5xl mb-4 text-cyan-300"></i>
+                    <h3 class="text-2xl font-bold mb-3">Lake View Retreat</h3>
+                    <p class="text-white/90">
+                        Wake up to serene lake views and peaceful natural surroundings.
+                    </p>
+                </div>
+
+
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-xl p-8 text-white text-center card-hover hover:bg-white/20 transition">
+                    <i class="ri-water-flash-line text-5xl mb-4 text-cyan-300"></i>
+                    <h3 class="text-2xl font-bold mb-3">Water Sports</h3>
+                    <p class="text-white/90">Surfing, diving, and jet ski adventures.</p>
+                </div>
+
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-xl p-8 text-white text-center card-hover hover:bg-white/20 transition">
+                    <i class="ri-restaurant-2-line text-5xl mb-4 text-orange-300"></i>
+                    <h3 class="text-2xl font-bold mb-3">Fine Dining</h3>
+                    <p class="text-white/90">Award-winning restaurants and bars.</p>
+                </div>
+
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-xl p-8 text-white text-center card-hover hover:bg-white/20 transition">
+                    <i class="ri-fire-line text-5xl mb-4 text-red-300"></i>
+                    <h3 class="text-2xl font-bold mb-3">Night Life</h3>
+                    <p class="text-white/90">Live music and lakeside entertainment.</p>
+                </div>
+
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-xl p-8 text-white text-center card-hover hover:bg-white/20 transition">
+                    <i class="ri-shield-check-line text-5xl mb-4 text-green-300"></i>
+                    <h3 class="text-2xl font-bold mb-3">Security</h3>
+                    <p class="text-white/90">24/7 security and medical facilities.</p>
+                </div>
+
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-xl p-8 text-white text-center card-hover hover:bg-white/20 transition">
+                    <i class="ri-hotel-bed-line text-5xl mb-4 text-purple-300"></i>
+                    <h3 class="text-2xl font-bold mb-3">Concierge</h3>
+                    <p class="text-white/90">Personal concierge for all arrangements.</p>
+                </div>
+
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-xl p-8 text-white text-center card-hover hover:bg-white/20 transition">
+                    <i class="ri-wifi-off-line text-5xl mb-4 text-pink-300"></i>
+                    <h3 class="text-2xl font-bold mb-3">Free WiFi</h3>
+                    <p class="text-white/90">High-speed internet throughout resort.</p>
+                </div>
+
+                <div
+                    class="bg-white/10 backdrop-blur-md rounded-xl p-8 text-white text-center card-hover hover:bg-white/20 transition">
+                    <i class="ri-parking-box-line text-5xl mb-4 text-green-300"></i>
+                    <h3 class="text-2xl font-bold mb-3">Spacious Parking</h3>
+                    <p class="text-white/90">
+                        Secure parking space.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Dining Section -->
+    <section id="dining" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-bold text-dark mb-4">Culinary Excellence</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-blue-600 to-orange-400 mx-auto"></div>
+            </div>
+
+            <!-- Swiper -->
+            <div class="swiper diningSwiper">
+                <div class="swiper-wrapper">
+
+                    <!-- mushroom -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                            <img loading="lazy"
+                                src="https://i.pinimg.com/1200x/48/75/9a/48759a8f60d30d2201f450f3e92634bb.jpg"
+                                class="w-full h-80 lg:h-64 object-cover" alt="Garlic Butter Mushroom">
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold text-dark mb-2">Garlic Butter Mushrooms</h3>
+                                <p class="text-gray-600 mb-4">
+                                    Juicy button mushrooms sautéed in rich butter, roasted garlic,
+                                    fresh herbs and a touch of pepper — served hot and aromatic.
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-yellow-500 text-lg"><i class="ri-star-fill"></i> 4.8/5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Fish Curry -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                            <img loading="lazy"
+                                src="https://i.pinimg.com/1200x/9f/f2/dc/9ff2dc7fa62161ee1c9e278db3680263.jpg"
+                                class="w-full h-80 lg:h-64 object-cover" alt="Fish Curry">
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold text-dark mb-2">Odia Fish Curry</h3>
+                                <p class="text-gray-600 mb-4">Fresh lake fish cooked in spicy mustard-based gravy.</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-yellow-500 text-lg"><i class="ri-star-fill"></i> 4.8/5</span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Mutton Kassa -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                            <img loading="lazy"
+                                src="https://i.pinimg.com/736x/e9/a5/92/e9a592bc11a55224937245014387e1d0.jpg"
+                                class="w-full h-80 lg:h-64 object-cover" alt="Mutton Kassa">
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold text-dark mb-2">Mutton Kassa</h3>
+                                <p class="text-gray-600 mb-4">Slow-cooked spicy Odia-style mutton with rich flavours.
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-yellow-500 text-lg"><i class="ri-star-fill"></i> 4.7/5</span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- veg biryani -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                            <img loading="lazy"
+                                src="https://i.pinimg.com/1200x/40/bc/a4/40bca44d0212d40a573e69b6cc737f9d.jpg"
+                                class="w-full h-80 lg:h-64 object-cover" alt="Veg Biryani">
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold text-dark mb-2">Veg Biryani</h3>
+                                <p class="text-gray-600 mb-4">
+                                    Aromatic basmati rice cooked with fresh vegetables, saffron,
+                                    mint, and traditional Odisha-style spices for a rich and flavorful experience.
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-yellow-500 text-lg"><i class="ri-star-fill"></i> 4.7/5</span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- chicken biryani -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-xl overflow-hidden shadow-lg">
+                            <img loading="lazy"
+                                src="https://i.pinimg.com/1200x/1a/59/f0/1a59f0e988c227075ce7a6e261f9f362.jpg"
+                                class="w-full h-80 lg:h-64 object-cover" alt="Chicken Biryani">
+                            <div class="p-6">
+                                <h3 class="text-2xl font-bold text-dark mb-2">Chicken Dum Biryani</h3>
+                                <p class="text-gray-600 mb-4">
+                                    Tender marinated chicken slow-cooked with fragrant basmati rice,
+                                    caramelized onions, ghee, and bold spices — a classic favorite.
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-yellow-500 text-lg"><i class="ri-star-fill"></i> 4.8/5</span>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="swiper-pagination mt-6"></div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="places" class="py-2 md:py-28 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-[#0B4799] mb-4">
+                    Best Places to Explore Near Tampara Resort
+                </h2>
+                <div class="w-24 h-1.5 bg-gradient-to-r from-[#0B4799] to-[#FE7303] mx-auto rounded-full"></div>
+                <p class="text-lg text-gray-700 mt-6 max-w-2xl mx-auto">
+                    Discover amazing attractions and natural beauty surrounding our resort, from ancient shrines to
+                    serene lake.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 group">
+                    <img loading="lazy" src="images/taratarini.jpg" alt="Taratarini Temple"
+                        class="w-full h-48 object-cover group-hover:scale-[1.05] transition duration-500"
+                        loading="lazy">
+                    <div class="p-6">
+                        <i class="ri-ancient-gate-line text-4xl text-red-600 mb-3"></i>
+                        <h3 class="text-2xl font-bold text-[#0B4799] mb-2">Taratarini Temple</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-4">
+                            At the bank of River Rushikulya Tara Tarini Temple is a famous Hindu shrine of Adi Shakti on
+                            Purnagiri or Kumari hills near Berhampur city in Ganjam district of Odisha. Purnesvari Maa
+                            Tara Tarini on Purnagiri hills is worshiped as the Breast Shrine of Adi Shakti.
+                        </p>
+                        <p class="text-sm text-red-600 font-semibold mb-4"><i class="ri-map-pin-line"></i> 32 km from
+                            Tampara Resort</p>
+
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 group">
+                    <img loading="lazy" src="images/gopalpur beach.jpg" alt="Gopalpur Beach"
+                        class="w-full h-48 object-cover group-hover:scale-[1.05] transition duration-500"
+                        loading="lazy">
+                    <div class="p-6">
+                        <i class="ri-sun-line text-4xl text-orange-600 mb-3"></i>
+                        <h3 class="text-2xl font-bold text-[#0B4799] mb-2">Gopalpur Beach</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-4">
+                            Gopalpur is a famous sea beach and a tourist destination. Gopalpur is around 15 km from
+                            Berhampur. While you are at Gopalpur, be sure to experience the magical sunrise & sunsets,
+                            steal a moment of solitude & enjoy a scenic boat ride.
+                        </p>
+                        <p class="text-sm text-orange-600 font-semibold mb-4"><i class="ri-map-pin-line"></i> 15 km from
+                            Tampara Resort</p>
+
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 group">
+                    <img loading="lazy" src="images/tampara lake.jpg" alt="Tampara Lake"
+                        class="w-full h-48 object-cover group-hover:scale-[1.05] transition duration-500"
+                        loading="lazy">
+                    <div class="p-6">
+                        <i class="ri-water-flash-line text-4xl text-blue-600 mb-3"></i>
+                        <h3 class="text-2xl font-bold text-[#0B4799] mb-2">Tampara Lake</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-4">
+                            Tampara Lake is a largest fresh water lake located in Ganjam District state of Odisha. It is
+                            around 3 km distance from Chatrapur and 24 km away from Berhampur. The beautiful lake and
+                            the nearby Chilika Lagoon highlight the ecological diversity.
+                        </p>
+                        <p class="text-sm text-blue-600 font-semibold mb-4"><i class="ri-map-pin-line"></i>  50m from
+                            Tampara Resort</p>
+
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 group">
+                    <img loading="lazy" src="images/bhairabi temple.jpg" alt="Bhairabi Temple"
+                        class="w-full h-48 object-cover group-hover:scale-[1.05] transition duration-500"
+                        loading="lazy">
+                    <div class="p-6">
+                        <i class="ri-lightbulb-line text-4xl text-purple-600 mb-3"></i>
+                        <h3 class="text-2xl font-bold text-[#0B4799] mb-2">Bhairabi Temple</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-4">
+                            Siddha Bhairavi Temple is one of the famous Shakti Pitha in Ganjam. It is situated 15 km
+                            distance from Berhampur town. 108 temples are having different gods and goddesses around the
+                            Siddha Bhairab, which is more attractive to the place.
+                        </p>
+                        <p class="text-sm text-purple-600 font-semibold mb-4"><i class="ri-map-pin-line"></i> 43 km from
+                            Tampara Resort</p>
+
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 group">
+                    <img loading="lazy" src="images/balakumari temple.jpg" alt="Balakumari Temple"
+                        class="w-full h-48 object-cover object-top group-hover:scale-[1.05] transition duration-500"
+                        loading="lazy">
+                    <div class="p-6">
+                        <i class="ri-landscape-line text-4xl text-green-600 mb-3"></i>
+                        <h3 class="text-2xl font-bold text-[#0B4799] mb-2">Balakumari Temple</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-4">
+                            Balakumari temple is situated on the top of the Kerandimala mountain, and it is 9 km from
+                            Chikiti and 37 km distance from Brahmapur in the District of Ganjam. Maa Balakumari is
+                            presiding in this temple. Devotees believe that the mother fulfils all their desires.
+                        </p>
+                        <p class="text-sm text-green-600 font-semibold mb-4"><i class="ri-map-pin-line"></i> 60 km from
+                            Tampara Resort</p>
+
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition duration-500 transform hover:-translate-y-1 group">
+                    <img loading="lazy" src="images/humari beach.jpg" alt="Humari Beach"
+                        class="w-full h-48 object-cover group-hover:scale-[1.05] transition duration-500"
+                        loading="lazy">
+                    <div class="p-6">
+                        <i class="ri-sailboat-line text-4xl text-yellow-600 mb-3"></i>
+                        <h3 class="text-2xl font-bold text-[#0B4799] mb-2">Humari Beach</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-4">
+                            Neque ut et velit dictum molestie at pellentesque aliquet magna ut tincidunt ullamcorper
+                            mauris mi et. Humari beach is a hidden gem perfect for quiet walks, nature photography, and
+                            escaping the usual tourist crowds.
+                        </p>
+                        <p class="text-sm text-yellow-600 font-semibold mb-4"><i class="ri-map-pin-line"></i> Check
+                            local distance</p>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-dark mb-4">Gallery</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-blue-600 to-orange-400 mx-auto"></div>
+            </div>
+
+            <div class="gallery-grid">
+                <div class="gallery-item rounded-xl overflow-hidden shadow-lg card-hover cursor-pointer group">
+                    <img loading="lazy" src="images/gallery1.jpeg" alt="Gallery 1"
+                        class="w-full h-64 object-cover group-hover:scale-110 transition duration-300" loading="lazy">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-lg card-hover cursor-pointer group">
+                    <img loading="lazy" src="images/gallery2.jpeg" alt="Gallery 2"
+                        class="w-full h-full object-cover object-top group-hover:scale-110 transition duration-300"
+                        loading="lazy">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-lg card-hover cursor-pointer group">
+                    <img loading="lazy" src="images/gallery3.jpeg" alt="Gallery 3"
+                        class="w-full h-64 object-cover group-hover:scale-110 transition duration-300" loading="lazy">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-lg card-hover cursor-pointer group">
+                    <img loading="lazy" src="images/gallery4.jpeg" alt="Gallery 4"
+                        class="w-full h-64 object-cover group-hover:scale-110 transition duration-300" loading="lazy">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-lg card-hover cursor-pointer group">
+                    <img loading="lazy" src="images/gallery6.jpeg" alt="Gallery 5"
+                        class="w-full h-64 object-cover group-hover:scale-110 transition duration-300" loading="lazy">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-lg card-hover cursor-pointer group">
+                    <img loading="lazy" src="images/gallery5.jpeg" alt="Gallery 6"
+                        class="w-full h-64 object-cover group-hover:scale-110 transition duration-300" loading="lazy">
+                </div>
+                <div class="gallery-item rounded-xl overflow-hidden shadow-lg card-hover cursor-pointer group">
+                    <img loading="lazy" src="images/gallery7.jpeg" alt="Gallery 5"
+                        class="w-full h-64 object-cover group-hover:scale-110 transition duration-300" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 bg-gradient-to-br from-blue-50 to-cyan-50">
+        <div class="max-w-6xl mx-auto px-4">
+
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold text-dark mb-4">Customer Feedback</h2>
+                <p class="text-gray-700 mb-3">View what our customers have to say!</p>
+                <div class="w-20 h-1 bg-gradient-to-r from-blue-600 to-orange-400 mx-auto"></div>
+            </div>
+
+            <!-- Testimonials Swiper -->
+            <div class="swiper testimonialSwiper">
+                <div class="swiper-wrapper">
+
+                    <!-- Review 1 -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
+
+                            <div class="flex justify-center mb-2">
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-half-fill text-yellow-400 text-2xl"></i>
+                            </div>
+                            <p class="font-semibold text-gray-700 mb-3">Rated 4.7 out of 5</p>
+
+                            <p class="text-lg text-gray-700 mb-6 italic">
+                                “The stay at Tampara Resort was a very unique experience. The colonial experience
+                                was great. Pool was small but clean, water sports were enjoyable though short.
+                                Overall, a perfect place to spend time with family and friends. Only issue is slow room
+                                service due to limited staff.”
+                            </p>
+
+                            <h3 class="font-bold text-dark text-lg">Srikant Muni</h3>
+                        </div>
+                    </div>
+
+                    <!-- Review 2 -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
+
+                            <div class="flex justify-center mb-2">
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-half-fill text-yellow-400 text-2xl"></i>
+                            </div>
+
+                            <p class="font-semibold text-gray-700 mb-3">Rated 4.5 out of 5</p>
+
+                            <p class="text-lg text-gray-700 mb-6 italic">
+                                “Fantastic small resort! Swimming pool, water sports, and the nearby park make
+                                the stay enjoyable. Food is truly excellent. We had a great time.”
+                            </p>
+
+                            <h3 class="font-bold text-dark text-lg">Ayaskant Sahoo</h3>
+                        </div>
+                    </div>
+
+                    <!-- Review 3 -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
+
+                            <div class="flex justify-center mb-2">
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-half-fill text-yellow-400 text-2xl"></i>
+                            </div>
+
+                            <p class="font-semibold text-gray-700 mb-3">Rated 4.5 out of 5</p>
+
+                            <p class="text-lg text-gray-700 mb-6 italic">
+                                “We were 7 senior citizens staying overnight on 25th Dec 2022. The accommodation,
+                                food, and hospitality were beyond expectations. Staff was proactive, food was excellent
+                                and affordable. A place worth visiting.”
+                            </p>
+
+                            <h3 class="font-bold text-dark text-lg">Dr. Sushil Kumar Giri</h3>
+                        </div>
+                    </div>
+
+                    <!-- Review 4 -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
+
+                            <div class="flex justify-center mb-2">
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-half-fill text-yellow-400 text-2xl"></i>
+                            </div>
+
+                            <p class="font-semibold text-gray-700 mb-3">Rated 4.5 out of 5</p>
+
+                            <p class="text-lg text-gray-700 mb-6 italic">
+                                “A very lively place with courteous staff. Location is the best—just beside Tampara
+                                Lake.
+                                Water sports, photos, and relaxing views. Service could be a bit faster, but overall
+                                excellent.”
+                            </p>
+
+                            <h3 class="font-bold text-dark text-lg">Bishnu Dash</h3>
+                        </div>
+                    </div>
+
+                    <!-- Review 5 -->
+                    <div class="swiper-slide">
+                        <div class="bg-white rounded-2xl p-8 shadow-lg text-center">
+
+                            <div class="flex justify-center mb-2">
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-fill text-yellow-400 text-2xl"></i>
+                                <i class="ri-star-half-fill text-yellow-400 text-2xl"></i>
+                            </div>
+
+                            <p class="font-semibold text-gray-700 mb-3">Rated 4.5 out of 5</p>
+
+                            <p class="text-lg text-gray-700 mb-6 italic">
+                                “Loved my one-night stay during our university retreat. The view, welcome drinks,
+                                rooms, lake activities, poolside fun—everything was amazing. Perfect place for groups.”
+                            </p>
+
+                            <h3 class="font-bold text-dark text-lg">Dr. Madhusmita Choudhury</h3>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Booking Section -->
+    <section id="booking" class="py-10 bg-gradient-to-r from-orange-400 via-red-500 to-pink-500">
+        <div class="max-w-3xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">Book Your Stay</h2>
+                <p class="text-xl text-white/90">Secure your dream vacation at Tampara Resort</p>
+            </div>
+
+            <form id="bookingForm" method="POST" action="form.php" class="bg-white rounded-2xl p-8 shadow-2xl">
+
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div>
+                        <label class="block font-bold mb-2">Full Name</label>
+                        <input type="text" name="guestName" required class="w-full px-4 py-3 bg-gray-50 rounded-lg"
+                            placeholder="John Doe">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold mb-2">Email Address</label>
+                        <input type="email" name="guestEmail" required class="w-full px-4 py-3 bg-gray-50 rounded-lg"
+                            placeholder="example@gmail.com">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold mb-2">Room Type</label>
+                        <select name="roomType" class="w-full px-4 py-3 bg-gray-50 rounded-lg">
+                            <option value="Premium Room">Premium Room</option>
+                            <option value="Executive Room">Executive Room</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block font-bold mb-2">Phone Number</label>
+                        <input type="tel" name="guestPhone" required class="w-full px-4 py-3 bg-gray-50 rounded-lg"
+                            placeholder="+91 0000-0000">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold mb-2">Number of Guests</label>
+                        <select name="guestCount" class="w-full px-4 py-3 bg-gray-50 rounded-lg">
+                            <option value="1 Guest">1 Guest</option>
+                            <option value="2 Guests">2 Guests</option>
+                            <option value="3 Guests">3 Guests</option>
+                            <option value="4 Guests">4 Guests</option>
+                            <option value="5+ Guests">5+ Guests</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block font-bold mb-2">Check-In Date</label>
+                        <input type="date" name="checkInDate" required class="w-full px-4 py-3 bg-gray-50 rounded-lg">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold mb-2">Check-Out Date</label>
+                        <input type="date" name="checkOutDate" required class="w-full px-4 py-3 bg-gray-50 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <label class="block font-bold mb-2">Special Requests</label>
+                    <textarea name="specialRequests"
+                        class="w-full px-4 py-3 bg-gray-50 rounded-lg border border-gray-200" rows="4"
+                        placeholder="Any special requests or dietary preferences..."></textarea>
+                </div>
+
+                <button type="submit"
+                    class="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold text-lg rounded-lg">
+                    Send Enquiry
+                </button>
+
+            </form>
+
+        </div>
+    </section>
+
+    <section id="contact" class="py-20 md:py-28 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-[#0B4799] mb-4">
+                    Get In Touch & Resort Information
+                </h2>
+                <div class="w-24 h-1.5 bg-gradient-to-r from-[#0B4799] to-[#FE7303] mx-auto rounded-full"></div>
+                <p class="text-lg text-gray-700 mt-6 max-w-2xl mx-auto">
+                    We're here to help you plan your perfect getaway. Find our location, contact details, and resort
+                    guidelines below.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12">
+
+                <div>
+                    <div
+                        class="w-full h-96 bg-gray-200 rounded-xl overflow-hidden shadow-2xl mb-8 border border-gray-300">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3764.1592793339905!2d85.00870411023911!3d19.36225474284923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a17fda72d3bf701%3A0xd5396952b0f8f158!2sTampara%20Resort!5e0!3m2!1sen!2sin!4v1764738587882!5m2!1sen!2sin"
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+
+                    <div class="bg-gray-100 p-8 rounded-xl shadow-inner border-t-4 border-[#0B4799]">
+                        <h3 class="text-2xl font-bold text-[#0B4799] mb-4">Send Us a Message</h3>
+                        <p class="text-gray-600 mb-4">For reservations or special requests, please use the form below.
+                        </p>
+                        <a href="#bookingForm"
+                            class="w-full bg-[#FE7303] text-white py-3 rounded-lg font-semibold hover:bg-[#C75B00] transition shadow-md">
+                            Submit Inquiry
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-3xl font-bold text-[#0B4799] mb-6">Contact Details</h3>
+                    <div class="space-y-6 mb-12">
+                        <div
+                            class="flex items-center space-x-4 bg-white p-4 rounded-xl shadow-md border-l-4 border-[#FE7303]">
+                            <i class="fas fa-phone-alt text-3xl text-[#FE7303] flex-shrink-0"></i>
+                            <div>
+                                <p class="text-lg font-semibold text-[#0B4799]">Reservation & General Inquiries</p>
+                                <a href="tel:+919124084003"
+                                    class="text-xl font-extrabold text-gray-800 hover:text-[#FE7303] transition">+91
+                                    9124084003</a>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-start space-x-4 bg-white p-4 rounded-xl shadow-md border-l-4 border-[#0B4799]">
+                            <i class="fas fa-map-marker-alt text-3xl text-[#0B4799] mt-1 flex-shrink-0"></i>
+                            <div>
+                                <p class="text-lg font-semibold text-[#0B4799]">Our Location</p>
+                                <address class="text-gray-600 not-italic">Tampara Resort near Tampara Lake, Chatrapur,
+                                    Odisha 761020</address>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center space-x-4 bg-white p-4 rounded-xl shadow-md border-l-4 border-[#FE7303]">
+                            <i class="fas fa-clock text-3xl text-[#FE7303] flex-shrink-0"></i>
+                            <div>
+                                <p class="text-lg font-semibold text-[#0B4799]">Working Hours</p>
+                                <p class="text-gray-600">24/7 Available for Guest Support & Reservations</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="p-8 bg-dark-blue text-white rounded-xl shadow-2xl">
+                        <h3 class="text-3xl font-bold text-[#0B4799] mb-4">Hotel Alert / Information</h3>
+                        <p class="text-gray-700 mb-6 leading-relaxed">
+                            Tampara Resort spread aside of the Spectacular Tampara Lake. This urban lake resort offers
+                            you a dialogue with the burble of the Tampara Lake. A luxury resort, where Hospitality Meets
+                            the bay of lake.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-[#0a0f1a] via-[#0a0d14] to-[#0a1a2b] text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img loading="lazy" class="w-40 h-auto" src="images/logo.png" alt="">
+                    </div>
+                    <p class="text-gray-400">Luxury Lakeside resort for unforgettable vacations.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-xl font-bold mb-4 text-blue-300">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#about" class="hover:text-blue-400 transition">About Us</a></li>
+                        <li><a href="#rooms" class="hover:text-blue-400 transition">Rooms</a></li>
+                        <li><a href="#dining" class="hover:text-blue-400 transition">Dining</a></li>
+                        <li><a href="#contact" class="hover:text-blue-400 transition">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xl font-bold mb-4 text-blue-300">Services</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#wedding" class="hover:text-blue-400 transition">Wedding Events</a></li>
+                        <li><a href="#amenities" class="hover:text-blue-400 transition">Amenities</a></li>
+                        <li><a href="#places" class="hover:text-blue-400 transition">Nearby Attractions</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xl font-bold mb-4 text-blue-300">Follow Us</h4>
+                    <div class="flex space-x-4 text-gray-400">
+                        <a href="https://www.facebook.com/tampararesort"
+                            class="text-2xl hover:text-blue-400 transition"><i class="ri-facebook-circle-line"></i></a>
+
+                        <a href="https://www.instagram.com/tampararesort/"
+                            class="text-2xl hover:text-blue-400 transition"><i class="ri-youtube-line"></i></a>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="border-gray-700 my-8">
+
+            <div class="text-center text-gray-500">
+                <p>&copy; 2025 Tampara Resort. All rights reserved. |
+                    <a href="#" class="hover:text-blue-400">Privacy Policy</a> |
+                    <a href="#" class="hover:text-blue-400">Terms of Service</a>
+                </p>
+            </div>
+
+        </div>
+    </footer>
+
+    <!-- GSAP CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Swiper JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Main JavaScript -->
+    <script>
+        // ==================== GSAP Setup ====================
+        gsap.registerPlugin(ScrollTrigger);
+
+
+
+        // Hero animations
+        gsap.fromTo('.hero-headline', {
+            opacity: 0,
+            y: 30
+        }, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: 0.5
+        });
+
+        gsap.fromTo('.hero-subheading', {
+            opacity: 0,
+            y: 30
+        }, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: 0.8
+        });
+
+        gsap.fromTo('.hero-cta', {
+            opacity: 0,
+            y: 30
+        }, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: 1.1
+        });
+
+        // Scroll reveals
+        gsap.utils.toArray('.card-hover').forEach(card => {
+            gsap.fromTo(card, {
+                opacity: 0,
+                y: 50
+            }, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 80%',
+                    end: 'top 20%',
+                    toggleActions: 'play none none none'
+                }
+            });
+        });
+
+        // ==================== Mobile Menu ====================
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const closeMobileMenuBtn = document.getElementById('closeMobileMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+            menuOverlay.classList.remove('hidden');
+        });
+
+        const closeMenu = () => {
+            mobileMenu.classList.remove('active');
+            menuOverlay.classList.add('hidden');
+        };
+
+        closeMobileMenuBtn.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+
+        // Close menu on link click
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // ==================== Smooth Scroll ====================
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+
+        // ==================== Button Ripple Effect ====================
+        document.querySelectorAll('.btn-ripple').forEach(button => {
+            button.addEventListener('click', function (e) {
+                const ripple = document.createElement('div');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.className = 'ripple';
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+
+                this.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // ==================== Set Minimum Date for Booking ====================
+        // const today = new Date().toISOString().split('T')[0];
+        // document.getElementById('checkInDate').setAttribute('min', today);
+        // document.getElementById('checkOutDate').setAttribute('min', today);
+
+
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !gsap.plugins.scrollTrigger) {
+            gsap.registerPlugin(ScrollTrigger);
+        }
+
+        // --- Premium Scrolling Animation ---
+
+        // 1. Animate Left Column (Images) - Slides in from left
+        gsap.from("[data-gsap-target='left-wedding-img']", {
+            scrollTrigger: {
+                trigger: "[data-gsap-target='left-wedding-img']",
+                start: "top 85%", // Start animation when the element enters the viewport
+                toggleActions: "play none none none",
+            },
+            opacity: 0,
+            x: -100, // Slide from the left
+            duration: 1.2,
+            ease: "power3.out"
+        });
+
+        // 2. Animate Right Column (Content) - Slides in from right
+        gsap.from("[data-gsap-target='right-wedding-content']", {
+            scrollTrigger: {
+                trigger: "[data-gsap-target='right-wedding-content']",
+                start: "top 85%",
+                toggleActions: "play none none none",
+            },
+            opacity: 0,
+            x: 100, // Slide from the right
+            duration: 1.2,
+            ease: "power3.out"
+        });
+
+        // 3. Animate Bottom Amenities - Fades and slides up with a slight delay
+        gsap.from("[data-gsap-target='wedding-amenities']", {
+            scrollTrigger: {
+                trigger: "[data-gsap-target='wedding-amenities']",
+                start: "top 85%",
+                toggleActions: "play none none none",
+            },
+            opacity: 0,
+            y: 50, // Slide up
+            duration: 1,
+            delay: 0.3,
+            ease: "power2.out"
+        });
+
+        var diningSwiper = new Swiper(".diningSwiper", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            breakpoints: {
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+        });
+
+        const heroSwiper = new Swiper(".heroSwiper", {
+            loop: true,
+            spaceBetween: 20,
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
+
+            breakpoints: {
+                // Mobile
+                0: {
+                    slidesPerView: 1,
+                },
+                // Desktop
+                1024: {
+                    slidesPerView: 1,
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
